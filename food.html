@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Food Ordering</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #007bff;
+            --secondary: #00c6ff;
+            --accent: #ff9500;
+            --success: #28a745;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .food-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .order-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ddd;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .step-number.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .step-number.completed {
+            background: var(--success);
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .progress-bar {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            z-index: 1;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .food-section {
+            display: none;
+        }
+        
+        .food-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Menu styles same as before */
+        .food-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .food-item {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .food-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .food-img {
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .food-details {
+            padding: 15px;
+        }
+        
+        .food-title {
+            font-weight: 600;
+            margin: 0 0 5px;
+        }
+        
+        .food-desc {
+            color: #666;
+            font-size: 14px;
+            margin: 0 0 10px;
+        }
+        
+        .food-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .food-price {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quantity-btn {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .quantity-value {
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        /* Review Order Section */
+        .order-summary {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .item-quantity {
+            background: var(--primary);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .item-price {
+            font-weight: 600;
+        }
+        
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid var(--primary);
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            font-weight: 500;
+        }
+        
+        .btn-prev {
+            background: #f8f9fa;
+            color: #666;
+        }
+        
+        .btn-next {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-confirm {
+            background: var(--success);
+            color: white;
+            width: 100%;
+        }
+        
+        /* Confirmation Section */
+        .confirmation {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .confirmation-icon {
+            font-size: 60px;
+            color: var(--success);
+            margin-bottom: 20px;
+        }
+        
+        .confirmation h3 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="food-container">
+        <!-- Order Progress Tracker -->
+        <div class="order-progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-step">
+                <div class="step-number active" id="step-1">1</div>
+                <div class="step-label">Select Food</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-number" id="step-2">2</div>
+                <div class="step-label">Review Order</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-number" id="step-3">3</div>
+                <div class="step-label">Confirmation</div>
+            </div>
+        </div>
+        
+        <!-- Step 1: Select Food -->
+        <div class="food-section active" id="select-food">
+            <h2><i class="fas fa-utensils"></i> Select Your Meal</h2>
+            <p>Choose from our onboard menu. Food will be delivered to your seat.</p>
+            
+            <div class="food-menu">
+                <!-- Food Item 1 -->
+                <div class="food-item">
+                    <div class="food-img" style="background-image: url('https://images.unsplash.com/photo-1512621776951-a57141f2eefd');"></div>
+                    <div class="food-details">
+                        <h3 class="food-title">Vegetable Sandwich</h3>
+                        <p class="food-desc">Fresh veggies with mayo on whole wheat bread</p>
+                        <div class="food-footer">
+                            <span class="food-price">$4.99</span>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus" data-id="1">-</button>
+                                <span class="quantity-value" data-id="1">0</span>
+                                <button class="quantity-btn plus" data-id="1">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Food Item 2 -->
+                <div class="food-item">
+                    <div class="food-img" style="background-image: url('https://images.unsplash.com/photo-1568901346375-23c9450c58cd');"></div>
+                    <div class="food-details">
+                        <h3 class="food-title">Cheeseburger</h3>
+                        <p class="food-desc">Classic beef patty with cheese and veggies</p>
+                        <div class="food-footer">
+                            <span class="food-price">$6.99</span>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus" data-id="2">-</button>
+                                <span class="quantity-value" data-id="2">0</span>
+                                <button class="quantity-btn plus" data-id="2">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Food Item 3 -->
+                <div class="food-item">
+                    <div class="food-img" style="background-image: url('https://images.unsplash.com/photo-1574484284002-952d92456975');"></div>
+                    <div class="food-details">
+                        <h3 class="food-title">Fruit Salad</h3>
+                        <p class="food-desc">Seasonal fresh fruits with yogurt</p>
+                        <div class="food-footer">
+                            <span class="food-price">$5.49</span>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus" data-id="3">-</button>
+                                <span class="quantity-value" data-id="3">0</span>
+                                <button class="quantity-btn plus" data-id="3">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Food Item 4 -->
+                <div class="food-item">
+                    <div class="food-img" style="background-image: url('https://images.unsplash.com/photo-1551024506-0bccd828d307');"></div>
+                    <div class="food-details">
+                        <h3 class="food-title">Chocolate Cake</h3>
+                        <p class="food-desc">Rich chocolate cake with frosting</p>
+                        <div class="food-footer">
+                            <span class="food-price">$4.25</span>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus" data-id="4">-</button>
+                                <span class="quantity-value" data-id="4">0</span>
+                                <button class="quantity-btn plus" data-id="4">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Food Item 5 -->
+                <div class="food-item">
+                    <div class="food-img" style="background-image: url('https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd');"></div>
+                    <div class="food-details">
+                        <h3 class="food-title">Coffee</h3>
+                        <p class="food-desc">Freshly brewed coffee</p>
+                        <div class="food-footer">
+                            <span class="food-price">$2.50</span>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus" data-id="5">-</button>
+                                <span class="quantity-value" data-id="5">0</span>
+                                <button class="quantity-btn plus" data-id="5">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Food Item 6 -->
+                <div class="food-item">
+                    <div class="food-img" style="background-image: url('https://images.unsplash.com/photo-1563805042-7684c019e1cb');"></div>
+                    <div class="food-details">
+                        <h3 class="food-title">Mineral Water</h3>
+                        <p class="food-desc">500ml bottled water</p>
+                        <div class="food-footer">
+                            <span class="food-price">$1.50</span>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus" data-id="6">-</button>
+                                <span class="quantity-value" data-id="6">0</span>
+                                <button class="quantity-btn plus" data-id="6">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn btn-prev" disabled>Back</button>
+                <button class="nav-btn btn-next" id="to-review">Review Order</button>
+            </div>
+        </div>
+        
+        <!-- Step 2: Review Order -->
+        <div class="food-section" id="review-order">
+            <h2><i class="fas fa-clipboard-check"></i> Review Your Order</h2>
+            
+            <div class="order-summary">
+                <h4>Order Summary</h4>
+                <div id="order-items">
+                    <!-- Order items will be inserted here by JavaScript -->
+                    <div class="empty-order">No items selected yet</div>
+                </div>
+                <div class="order-total">
+                    <span>Total:</span>
+                    <span id="order-total">$0.00</span>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn btn-prev" id="back-to-menu">Back to Menu</button>
+                <button class="nav-btn btn-confirm" id="confirm-order">Confirm Order</button>
+            </div>
+        </div>
+        
+        <!-- Step 3: Confirmation -->
+        <div class="food-section" id="confirmation">
+            <div class="confirmation">
+                <div class="confirmation-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Order Confirmed!</h3>
+                <p>Your food will be delivered to seat <strong>14B</strong> on <strong>Express #205</strong>.</p>
+                <p>Estimated delivery time: <strong>20 minutes</strong></p>
+                <button class="nav-btn btn-prev" id="new-order" style="margin-top: 20px;">
+                    <i class="fas fa-utensils"></i> Order More Food
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Food menu data
+        const menuItems = {
+            1: { name: "Vegetable Sandwich", price: 4.99 },
+            2: { name: "Cheeseburger", price: 6.99 },
+            3: { name: "Fruit Salad", price: 5.49 },
+            4: { name: "Chocolate Cake", price: 4.25 },
+            5: { name: "Coffee", price: 2.50 },
+            6: { name: "Mineral Water", price: 1.50 }
+        };
+        
+        // Current order state
+        let order = {};
+        let currentStep = 1;
+        
+        // Initialize quantity controls
+        document.querySelectorAll('.quantity-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const isPlus = this.classList.contains('plus');
+                
+                // Update quantity
+                if (!order[id]) order[id] = 0;
+                
+                if (isPlus) {
+                    order[id]++;
+                } else if (order[id] > 0) {
+                    order[id]--;
+                }
+                
+                // Update display
+                document.querySelector(`.quantity-value[data-id="${id}"]`).textContent = order[id];
+                
+                // Enable/disable review button
+                document.getElementById('to-review').disabled = !hasItems();
+            });
+        });
+        
+        // Check if order has any items
+        function hasItems() {
+            return Object.values(order).some(qty => qty > 0);
+        }
+        
+        // Navigation between steps
+        document.getElementById('to-review').addEventListener('click', function() {
+            if (!hasItems()) return;
+            updateOrderSummary();
+            goToStep(2);
+        });
+        
+        document.getElementById('back-to-menu').addEventListener('click', function() {
+            goToStep(1);
+        });
+        
+        document.getElementById('confirm-order').addEventListener('click', function() {
+            // In a real app, this would send the order to the server
+            goToStep(3);
+        });
+        
+        document.getElementById('new-order').addEventListener('click', function() {
+            // Reset for new order
+            order = {};
+            resetQuantities();
+            document.getElementById('to-review').disabled = true;
+            goToStep(1);
+        });
+        
+        // Update order summary display
+        function updateOrderSummary() {
+            const orderItemsEl = document.getElementById('order-items');
+            let total = 0;
+            
+            // Clear existing items
+            orderItemsEl.innerHTML = '';
+            
+            // Add each ordered item
+            for (const [id, qty] of Object.entries(order)) {
+                if (qty > 0) {
+                    const item = menuItems[id];
+                    const itemTotal = item.price * qty;
+                    total += itemTotal;
+                    
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'order-item';
+                    itemEl.innerHTML = `
+                        <div class="item-name">
+                            <span class="item-quantity">${qty}</span>
+                            <span>${item.name}</span>
+                        </div>
+                        <div class="item-price">$${itemTotal.toFixed(2)}</div>
+                    `;
+                    orderItemsEl.appendChild(itemEl);
+                }
+            }
+            
+            // Update total
+            document.getElementById('order-total').textContent = `$${total.toFixed(2)}`;
+            
+            // Show empty message if no items
+            if (total === 0) {
+                orderItemsEl.innerHTML = '<div class="empty-order">No items selected yet</div>';
+            }
+        }
+        
+        // Reset all quantity displays to 0
+        function resetQuantities() {
+            document.querySelectorAll('.quantity-value').forEach(el => {
+                el.textContent = '0';
+            });
+        }
+        
+        // Handle step navigation
+        function goToStep(step) {
+            // Hide all sections
+            document.querySelectorAll('.food-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show current section
+            document.getElementById(
+                step === 1 ? 'select-food' :
+                step === 2 ? 'review-order' : 'confirmation'
+            ).classList.add('active');
+            
+            // Update progress tracker
+            document.querySelectorAll('.step-number').forEach((el, i) => {
+                el.classList.remove('active', 'completed');
+                if (i + 1 === step) {
+                    el.classList.add('active');
+                } else if (i + 1 < step) {
+                    el.classList.add('completed');
+                }
+            });
+            
+            // Update progress bar
+            document.getElementById('progress-fill').style.width = `${(step - 1) * 50}%`;
+            
+            currentStep = step;
+        }
+    </script>
+</body>
+</html>

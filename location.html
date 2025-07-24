@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Location Finder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #007bff;
+            --secondary: #00c6ff;
+            --accent: #ff9500;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .search-box {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        input, select, button {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        input, select {
+            flex: 1;
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #0069d9;
+        }
+        
+        #map {
+            height: 400px;
+            background: #eee;
+            border-radius: 8px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bus-marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            left: 50%;
+            top: 50%;
+            margin: -20px 0 0 -20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        .bus-marker:after {
+            content: "";
+            width: 14px;
+            height: 14px;
+            margin: 8px 0 0 8px;
+            background: white;
+            position: absolute;
+            border-radius: 50%;
+        }
+        
+        .bus-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .bus-info.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bus-route {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .route-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .route-line {
+            flex: 1;
+            height: 2px;
+            background: #ddd;
+            margin: 0 10px;
+        }
+        
+        .bus-timings {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        .timing-box {
+            text-align: center;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .timing-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .timing-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .search-box {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-bus"></i> Bus Location Finder</h1>
+        
+        <div class="search-box">
+            <input type="text" id="bus-number" placeholder="Enter bus number">
+            <select id="route-select">
+                <option value="">Select route</option>
+                <option value="route1">Downtown Express</option>
+                <option value="route2">University Shuttle</option>
+                <option value="route3">Airport Connect</option>
+            </select>
+            <button id="search-btn"><i class="fas fa-search"></i> Find</button>
+        </div>
+        
+        <div id="map">
+            <!-- Bus marker will be positioned here by JavaScript -->
+            <div class="bus-marker" id="bus-marker"></div>
+        </div>
+        
+        <div class="no-results" id="no-results">
+            <i class="fas fa-bus-slash" style="font-size: 40px; margin-bottom: 10px;"></i>
+            <p>No buses found matching your search</p>
+        </div>
+        
+        <div class="bus-info" id="bus-info">
+            <h3 id="bus-title">Downtown Express #205</h3>
+            
+            <div class="bus-route">
+                <div class="route-dot"></div>
+                <span id="start-point">Central Station</span>
+                <div class="route-line"></div>
+                <div class="route-dot" style="background: var(--accent);"></div>
+                <span id="end-point">City Mall</span>
+            </div>
+            
+            <div class="bus-timings">
+                <div class="timing-box">
+                    <div class="timing-label">Next Stop</div>
+                    <div class="timing-value" id="next-stop">Main Square</div>
+                </div>
+                <div class="timing-box">
+                    <div class="timing-label">Arriving in</div>
+                    <div class="timing-value" id="arrival-time">8 min</div>
+                </div>
+                <div class="timing-box">
+                    <div class="timing-label">Current Speed</div>
+                    <div class="timing-value" id="bus-speed">32 km/h</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchBtn = document.getElementById('search-btn');
+            const busMarker = document.getElementById('bus-marker');
+            const busInfo = document.getElementById('bus-info');
+            const noResults = document.getElementById('no-results');
+            
+            // Sample bus data (in real app, this would come from API)
+            const buses = {
+                '205': {
+                    route: 'route1',
+                    name: 'Downtown Express #205',
+                    start: 'Central Station',
+                    end: 'City Mall',
+                    position: { x: 65, y: 40 },
+                    nextStop: 'Main Square',
+                    arrival: '8 min',
+                    speed: '32 km/h'
+                },
+                '308': {
+                    route: 'route2',
+                    name: 'University Shuttle #308',
+                    start: 'North Campus',
+                    end: 'South Station',
+                    position: { x: 25, y: 75 },
+                    nextStop: 'Library',
+                    arrival: '15 min',
+                    speed: '25 km/h'
+                }
+            };
+            
+            searchBtn.addEventListener('click', function() {
+                const busNumber = document.getElementById('bus-number').value.trim();
+                const route = document.getElementById('route-select').value;
+                
+                // Reset UI
+                busMarker.style.display = 'none';
+                busInfo.classList.remove('active');
+                noResults.style.display = 'none';
+                
+                // Find bus
+                if (busNumber && buses[busNumber] && (!route || buses[busNumber].route === route)) {
+                    const bus = buses[busNumber];
+                    
+                    // Position the bus marker
+                    busMarker.style.left = `${bus.position.x}%`;
+                    busMarker.style.top = `${bus.position.y}%`;
+                    busMarker.style.display = 'block';
+                    
+                    // Update bus info
+                    document.getElementById('bus-title').textContent = bus.name;
+                    document.getElementById('start-point').textContent = bus.start;
+                    document.getElementById('end-point').textContent = bus.end;
+                    document.getElementById('next-stop').textContent = bus.nextStop;
+                    document.getElementById('arrival-time').textContent = bus.arrival;
+                    document.getElementById('bus-speed').textContent = bus.speed;
+                    
+                    busInfo.classList.add('active');
+                } else {
+                    noResults.style.display = 'block';
+                }
+            });
+            
+            // Simulate real-time updates (in real app, this would be WebSocket)
+            setInterval(() => {
+                if (busMarker.style.display === 'block') {
+                    // Just for demo - in real app you'd get actual position updates
+                    const currentX = parseInt(busMarker.style.left);
+                    const newX = currentX + (Math.random() * 2 - 1);
+                    
+                    if (newX > 5 && newX < 95) {
+                        busMarker.style.left = `${newX}%`;
+                    }
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Status</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #007bff, #00c6ff, #007bff);
+            color: white;
+            min-height: 100vh;
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .payment-table-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+            margin-bottom: 30px;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #333;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        th {
+            background: linear-gradient(45deg, #007bff, #00c6ff);
+            color: white;
+            font-weight: 500;
+        }
+
+        tr:nth-child(even) { background-color: rgba(0, 123, 255, 0.03); }
+        tr:hover { background-color: rgba(0, 123, 255, 0.08); transform: scale(1.005); transition: all 0.2s ease; }
+
+        .status {
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .status-pending { background-color: #FFF3CD; color: #856404; }
+        .status-paid { background-color: #D4EDDA; color: #155724; }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-pay { background: linear-gradient(45deg, #28a745, #20c997); color: white; }
+        .btn-pay:hover { background: linear-gradient(45deg, #218838, #1aa179); transform: translateY(-2px); }
+
+        .btn-delete { background: linear-gradient(45deg, #dc3545, #e83e8c); color: white; margin-left: 10px; }
+        .btn-delete:hover { background: linear-gradient(45deg, #c82333, #d81b60); transform: translateY(-2px); }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(45deg, #007bff, #00c6ff);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .refresh-btn:hover { transform: rotate(180deg) scale(1.1); }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1><i class="fas fa-receipt"></i> Payment Status</h1>
+        <div class="payment-table-container">
+            <table id="paymentTable">
+                <thead>
+                    <tr>
+                        <th>Passenger</th>
+                        <th>Bus</th>
+                        <th>Travel Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="6" class="loading">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="refresh-btn" onclick="fetchPayments()">
+        <i class="fas fa-sync-alt"></i>
+    </div>
+
+    <script>
+        async function fetchPayments() {
+            const tableBody = document.querySelector('#paymentTable tbody');
+            tableBody.innerHTML = '<tr><td colspan="6" class="loading">Loading...</td></tr>';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/tickets');
+                const bookings = await response.json();
+                tableBody.innerHTML = '';
+
+                bookings.forEach(booking => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${booking.passengerName}</td>
+                        <td>${booking.busName}</td>
+                        <td>${new Date(booking.travelDate).toLocaleDateString()}</td>
+                        <td>$${(booking.numSeats * 20).toFixed(2)}</td>
+                        <td><span class="status ${booking.paymentStatus === "Paid" ? 'status-paid' : 'status-pending'}">
+                            ${booking.paymentStatus || 'Pending'}</span></td>
+                        <td>
+                            ${booking.paymentStatus === "Paid" ? 
+                                '<span class="paid-badge"><i class="fas fa-check-circle"></i> Paid</span>' :
+                                `<button class="btn btn-pay" onclick="updatePayment('${booking._id}')">Pay Now</button>`}
+                            <button class="btn btn-delete" onclick="deletePayment('${booking._id}')">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error fetching payments:", error);
+                tableBody.innerHTML = '<tr><td colspan="6">Failed to load payments.</td></tr>';
+            }
+        }
+
+        async function updatePayment(ticketId) {
+            await fetch(`http://localhost:3000/api/tickets/${ticketId}/pay`, { method: 'PATCH' });
+            fetchPayments();
+        }
+
+        async function deletePayment(ticketId) {
+            if (confirm("Are you sure?")) {
+                await fetch(`http://localhost:3000/api/tickets/${ticketId}`, { method: 'DELETE' });
+                fetchPayments();
+            }
+        }
+
+        window.onload = fetchPayments;
+    </script>
+</body>
+</html>

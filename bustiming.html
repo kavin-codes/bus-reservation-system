@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Ticket Booking</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+        }
+
+        .form-background, .bus-details {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            color: #fff;
+        }
+
+        h2 {
+            color: #fbc02d;
+            text-align: center;
+            font-size: 26px;
+        }
+
+        .search-box {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 80%;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .search-box input::placeholder {
+            color: #ddd;
+        }
+
+        .search-box input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .bus-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        .bus-info {
+            width: 45%;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .bus-info:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 25px rgba(255, 255, 255, 0.3);
+        }
+
+        .bus-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .bus-info h3 {
+            margin: 5px 0;
+            color: #ffeb3b;
+            font-size: 20px;
+        }
+
+        .bus-info p {
+            font-size: 16px;
+            color: #ddd;
+        }
+
+        .book-now {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff9800, #ff5722);
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .book-now:hover {
+            background: linear-gradient(45deg, #ff5722, #e91e63);
+            box-shadow: 0 0 10px rgba(255, 87, 34, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-background">
+        <h2>🚌 Bus Ticket Booking</h2>
+        <!-- Booking Form Placeholder -->
+    </div>
+
+    <div class="bus-details">
+        <h2>🚏 Available Buses</h2>
+
+        <!-- 🔎 Search Box -->
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Search by name, time, or location..." onkeyup="filterBuses()">
+        </div>
+
+        <div class="bus-container" id="busList">
+            <div class="bus-info">
+                <img src="images/image 1.jpeg" alt="Express Travels" class="bus-image">
+                <h3 class="bus-name">Express Travels</h3>
+                <p class="bus-details">🕒 Departure: 08:00 AM | Arrival: 12:00 PM</p>
+                <p class="bus-location">🚎 Type: AC | 💲 Price: $30</p>
+                <a href="testing1.html" class="book-now">Book Now</a>
+            </div>
+
+            <div class="bus-info">
+                <img src="images/image2.webp" alt="City Link" class="bus-image">
+                <h3 class="bus-name">City Link</h3>
+                <p class="bus-details">🕒 Departure: 10:00 AM | Arrival: 02:00 PM</p>
+                <p class="bus-location">🚎 Type: Non-AC | 💲 Price: $25</p>
+                <a href="testing1.html" class="book-now">Book Now</a>
+            </div>
+
+            <div class="bus-info">
+                <img src="images/image3.webp" alt="Green Line" class="bus-image">
+                <h3 class="bus-name">Green Line</h3>
+                <p class="bus-details">🕒 Departure: 06:00 PM | Arrival: 10:00 PM</p>
+                <p class="bus-location">🚎 Type: Sleeper | 💲 Price: $35</p>
+                <a href="testing1.html" class="book-now">Book Now</a>
+            </div>
+
+            <div class="bus-info">
+                <img src="images/image4.jpeg" alt="Red Express" class="bus-image">
+                <h3 class="bus-name">Red Express</h3>
+                <p class="bus-details">🕒 Departure: 07:00 AM | Arrival: 11:00 AM</p>
+                <p class="bus-location">🚎 Type: AC | 💲 Price: $28</p>
+                <a href="testing1.html" class="book-now">Book Now</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterBuses() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let buses = document.getElementsByClassName("bus-info");
+
+            for (let i = 0; i < buses.length; i++) {
+                let name = buses[i].getElementsByClassName("bus-name")[0].innerText.toLowerCase();
+                let details = buses[i].getElementsByClassName("bus-details")[0].innerText.toLowerCase();
+                let location = buses[i].getElementsByClassName("bus-location")[0].innerText.toLowerCase();
+
+                if (name.includes(input) || details.includes(input) || location.includes(input)) {
+                    buses[i].style.display = "block";
+                } else {
+                    buses[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

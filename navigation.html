@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Booking System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #007bff;
+            --secondary: #00c6ff;
+            --accent: #ff9500;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--primary));
+            color: white;
+            text-align: center;
+            min-height: 100vh;
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        nav {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: white;
+            margin: 5px 10px;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        nav a i {
+            margin-right: 8px;
+        }
+
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.5s;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            animation: textGlow 2s infinite alternate;
+        }
+
+        @keyframes textGlow {
+            from { text-shadow: 0 0 5px #fff, 0 0 10px #fff; }
+            to { text-shadow: 0 0 10px #fff, 0 0 20px var(--primary), 0 0 30px var(--primary); }
+        }
+
+        .info-card {
+            font-size: 18px;
+            margin: 15px 0;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .info-card:hover {
+            transform: scale(1.02);
+        }
+
+        #special-offer {
+            animation: pulse 2s infinite;
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+            padding: 15px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        .contact {
+            margin: 40px auto;
+            padding: 30px;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+
+        .contact:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .quick-book {
+            background: linear-gradient(45deg, var(--accent), #ff6b00);
+            color: white;
+            font-size: 20px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255, 153, 0, 0.4);
+            margin: 20px 0;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .quick-book i {
+            margin-right: 10px;
+        }
+
+        .quick-book:hover {
+            background: linear-gradient(45deg, #ffaa33, #ff8000);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 153, 0, 0.6);
+        }
+
+        .quick-book:active {
+            transform: translateY(1px);
+        }
+
+        /* Enhanced Chatbox Styles */
+        .chatbox-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 380px;
+            background: white;
+            color: var(--dark);
+            border-radius: 15px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            transform-origin: bottom right;
+            animation: scaleIn 0.3s ease-out;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .chatbox-header {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbox-header i {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .chatbox-header i:hover {
+            transform: rotate(90deg);
+        }
+
+        .chatbox-messages {
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            font-size: 14px;
+            background: #f9f9f9;
+        }
+
+        .chat-message {
+            margin: 10px 0;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            position: relative;
+            animation: messageIn 0.3s ease-out;
+        }
+
+        @keyframes messageIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background: #e9ecef;
+            color: var(--dark);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
+        .chatbox-input-container {
+            padding: 15px;
+            display: flex;
+            border-top: 1px solid #eee;
+            background: white;
+            align-items: center;
+        }
+
+        .chatbox-input {
+            flex: 1;
+            padding: 12px 15px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .chatbox-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        .chatbox-send-btn {
+            padding: 12px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chatbox-send-btn:hover {
+            background: linear-gradient(45deg, #0069d9, #00a8ff);
+            transform: translateX(3px) rotate(10deg);
+        }
+
+        .chatbox-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .chatbox-button:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Floating bus animation */
+        .floating-bus {
+            position: absolute;
+            font-size: 30px;
+            animation: float 10s linear infinite;
+            opacity: 0.7;
+            z-index: -1;
+            filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-100px) translateY(20px); }
+            100% { transform: translateX(calc(100vw + 100px)) translateY(20px); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            nav a {
+                font-size: 14px;
+                padding: 8px 15px;
+                margin: 3px 5px;
+            }
+
+            .container {
+                padding: 25px;
+                margin: 25px 15px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .chatbox-container {
+                width: 90%;
+                right: 5%;
+                bottom: 80px;
+            }
+
+            .chatbox-button {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            padding: 10px 15px;
+            background: #e9ecef;
+            border-radius: 18px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #6c757d;
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating bus animations -->
+    <div class="floating-bus" style="top: 20%; animation-delay: 0s; animation-duration: 15s;">🚌</div>
+    <div class="floating-bus" style="top: 40%; animation-delay: 3s; animation-duration: 12s;">🚍</div>
+    <div class="floating-bus" style="top: 70%; animation-delay: 6s; animation-duration: 18s;">🚎</div>
+
+    <nav>
+        <a href="/testing1.html"><i class="fas fa-ticket-alt"></i> Booking Form</a>
+        <a href="/retrive.html"><i class="fas fa-search"></i> Retrieve Bookings</a>
+        <a href="/bustiming.html"><i class="fas fa-clock"></i> Bus Timings</a>
+        <a href="/payment.html"><i class="fas fa-credit-card"></i> Payments</a>
+        <a href="/food.html"><i class="fas fa-chair"></i> food catering</a>
+        <a href="/location.html"><i class="fas fa-file-export"></i> tracker</a>
+    </nav>
+    
+    <div class="container">
+        <h1 id="greeting">Welcome to the Bus Booking System! <i class="fas fa-bus"></i></h1>
+        <p>Book your journey with ease and comfort. Your adventure starts here!</p>
+        
+        <button class="quick-book" onclick="location.href='testing1.html'">
+            <i class="fas fa-bolt"></i> Quick Book Now
+        </button>
+        
+        <div class="info-card" id="clock">
+            <i class="fas fa-clock"></i> Loading time...
+        </div>
+        
+        <div class="info-card" id="countdown">
+            <i class="fas fa-hourglass-half"></i> Next Bus in: --:--
+        </div>
+        
+        <div class="info-card" id="special-offer">
+            <i class="fas fa-gift"></i> Today's Special: Get 15% off on all AC Buses! Limited time offer!
+        </div>
+        
+        <div class="info-card" id="recent-trip">
+            <i class="fas fa-history"></i> Last Trip: Not Available
+        </div>
+    </div>
+
+    <div class="contact">
+        <h2><i class="fas fa-headset"></i> Need Help? We're Here for You!</h2>
+        <p><i class="fas fa-envelope"></i> Email: support@busbooking.com</p>
+        <p><i class="fas fa-phone"></i> Phone: +123 456 7890</p>
+        <p><i class="fas fa-clock"></i> Support Hours: 24/7</p>
+    </div>
+
+    <!-- Enhanced AI Chatbox -->
+    <div class="chatbox-container" id="chatbox">
+        <div class="chatbox-header">
+            <span><i class="fas fa-robot"></i> Bus Booking Assistant</span>
+            <i class="fas fa-times" onclick="toggleChatbox()"></i>
+        </div>
+        <div class="chatbox-messages" id="chat-messages">
+            <div class="chat-message bot-message">
+                Hello! I'm your bus booking assistant. How can I help you today?
+            </div>
+        </div>
+        <div class="chatbox-input-container">
+            <input type="text" class="chatbox-input" id="chat-input" 
+                   placeholder="Ask me anything about bus bookings..." 
+                   onkeypress="handleKeyPress(event)">
+            <button class="chatbox-send-btn" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    
+    <button class="chatbox-button" onclick="toggleChatbox()">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+
+    <script>
+        // Update clock in real-time
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            document.getElementById("clock").innerHTML = `
+                <i class="fas fa-clock"></i> ${dateString}<br>
+                <i class="far fa-clock"></i> ${timeString}
+            `;
+
+            // Update greeting based on time of day
+            const hour = now.getHours();
+            let greeting = "Good ";
+            if (hour < 12) greeting += "Morning";
+            else if (hour < 18) greeting += "Afternoon";
+            else greeting += "Evening";
+
+            document.getElementById("greeting").innerHTML = `
+                ${greeting}! Welcome to the Bus Booking System! <i class="fas fa-bus"></i>
+            `;
+        }
+        
+        setInterval(updateClock, 1000);
+        updateClock(); // Run immediately
+
+        // Fixed Bus Timings (24-hour format)
+        const busTimings = ["06:00", "09:00", "12:00", "15:00", "18:00", "21:00"];
+
+        function getNextBusTime() {
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes(); // Convert to minutes
+
+            for (let time of busTimings) {
+                let [hour, minute] = time.split(":").map(Number);
+                let busTimeInMinutes = hour * 60 + minute;
+
+                if (busTimeInMinutes > currentTime) {
+                    return { hour, minute }; // Next bus found
+                }
+            }
+
+            // If no buses left today, return the first bus of the next day
+            let [hour, minute] = busTimings[0].split(":").map(Number);
+            return { hour, minute, nextDay: true };
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+            let { hour, minute, nextDay } = getNextBusTime();
+
+            let nextBus = new Date();
+            nextBus.setHours(hour, minute, 0, 0);
+            if (nextDay) nextBus.setDate(nextBus.getDate() + 1); // Move to next day
+
+            let diff = nextBus - now; // Time difference in milliseconds
+            let hours = Math.floor(diff / (1000 * 60 * 60));
+            let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById("countdown").innerHTML = `
+                <i class="fas fa-hourglass-half"></i> Next Bus at: ${hour}:${minute < 10 ? "0" + minute : minute} 
+                (${hours}h ${minutes}m ${seconds}s)
+            `;
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown(); // Run once on page load
+
+        function toggleChatbox() {
+            let chatbox = document.getElementById("chatbox");
+            chatbox.style.display = chatbox.style.display === "flex" ? "none" : "flex";
+            
+            // Focus input when chatbox opens
+            if (chatbox.style.display === "flex") {
+                document.getElementById("chat-input").focus();
+            }
+        }
+
+        // Store responses globally after loading
+        let chatResponses = {};
+        let responsesLoaded = false;
+
+        // Predefined responses for instant replies
+        const predefinedResponses = {
+            "hello": "Hello! How can I help with your bus booking today?",
+            "hi": "Hi there! Need help with bus schedules or bookings?",
+            "hey": "Hey! How can I assist you?",
+            "good morning": "Good morning! Need help booking a bus?",
+            "good afternoon": "Good afternoon! Looking for bus schedules?",
+            "good evening": "Good evening! How can I assist you today?",
+
+            "how are you": "I'm just a chatbot, but I'm doing great! How about you?",
+            "how are you doing": "I'm doing well! How can I assist you today?",
+            "what's up": "Not much, just here to help with bus bookings. What's up with you?",
+            "i am fine": "Glad to hear that! How can I help you today?",
+            "i am good": "That's great! Let me know if you need any help.",
+            "i am not fine": "Oh no! I hope things get better soon. Let me know if I can assist you with anything.",
+            "how is your day": "My day is going great, thanks for asking! How's yours?",
+
+            "book": "You can book a bus by clicking the 'Quick Book Now' button!",
+            "how to book": "To book a bus, go to the booking page and enter your details.",
+            "booking status": "You can check your booking status on the 'Retrieve Bookings' page.",
+
+            "schedule": "Check our bus timings on the Bus Timings page.",
+            "bus timings": "Buses run every 3 hours from 6AM to 9PM daily.",
+            "next bus": "Let me check... The next bus is arriving soon! Check the live countdown.",
+            "available buses": "Our buses run frequently. Visit the Bus Timings page for full details.",
+
+            "seat availability": "You can check live seat availability on the 'Live Seat Availability' page.",
+
+            "payment": "For payment questions, visit our Payment Status page.",
+            "payment options": "We accept credit/debit cards, UPI, and net banking.",
+            "refund policy": "Refunds are processed within 5-7 business days.",
+            "cancel booking": "You can cancel your booking from the Retrieve Bookings page.",
+
+            "offers": "Today's special offer: Get 10% off on AC buses! 🎉",
+            "discounts": "We frequently offer discounts. Check our homepage for deals!",
+
+            "contact": "You can contact support at support@busbooking.com or call +123 456 7890.",
+            "help": "I can help with bookings, schedules, and payments. What do you need?",
+            "support": "Our support team is available 24/7. Contact us for assistance.",
+
+            "who are you": "I'm your friendly AI assistant here to help you with bus bookings!",
+            "what can you do": "I can help with bus bookings, schedules, payments, and more!",
+            "tell me a joke": "Sure! Why did the bus driver bring a ladder? Because he wanted to go to the next level! 😆",
+            "tell me a fun fact": "Did you know? The world's longest bus route runs for over 6,200 miles, from Lima, Peru to Rio de Janeiro, Brazil! 🚌",
+
+            "default": "I'm your bus booking assistant. Ask me about schedules, bookings, or payments!"
+        };
+
+        // Load responses when page loads
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                let response = await fetch('responses.json');
+                chatResponses = await response.json();
+                responsesLoaded = true;
+                console.log("Responses loaded successfully");
+            } catch (error) {
+                console.error("Error loading responses:", error);
+                // Fallback to predefined responses if JSON fails
+                chatResponses = predefinedResponses;
+                responsesLoaded = true;
+            }
+        });
+
+        function sendMessage() {
+            const input = document.getElementById("chat-input");
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatMessages = document.getElementById("chat-messages");
+            
+            // Add user message
+            const userMessage = document.createElement("div");
+            userMessage.className = "chat-message user-message";
+            userMessage.innerHTML = `<strong>You:</strong> ${message}`;
+            chatMessages.appendChild(userMessage);
+            
+            // Clear input
+            input.value = "";
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Show typing indicator
+            const typingIndicator = document.createElement("div");
+            typingIndicator.className = "typing-indicator";
+            typingIndicator.id = "typing-indicator";
+            typingIndicator.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            chatMessages.appendChild(typingIndicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Process response after short delay
+            setTimeout(() => {
+                // Remove typing indicator
+                const typingElement = document.getElementById("typing-indicator");
+                if (typingElement) typingElement.remove();
+                
+                // Get response
+                const lowerMessage = message.toLowerCase();
+                let aiResponse = chatResponses[lowerMessage] || "default";
+                
+                // If direct match not found, look for partial matches
+                if (aiResponse === "default") {
+                    for (const [key, value] of Object.entries(chatResponses)) {
+                        if (lowerMessage.includes(key)) {
+                            aiResponse = value;
+                            break;
+                        }
+                    }
+                    aiResponse = aiResponse === "default" ? chatResponses["default"] : aiResponse;
+                }
+                
+                // Add bot response
+                const botMessage = document.createElement("div");
+                botMessage.className = "chat-message bot-message";
+                botMessage.innerHTML = `<strong>Assistant:</strong> ${aiResponse}`;
+                chatMessages.appendChild(botMessage);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 500); // Short delay for natural feel
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") sendMessage();
+        }
+    </script>
+</body>
+</html>
